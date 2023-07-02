@@ -15,14 +15,14 @@ public class CheckMove {
     {
         return (isValidRow(i)&& isValidCol(j)&& isValidNum(num)&& unUsedInRow(i, num) &&
                 unUsedInCol(j, num) &&
-                unUsedInBox(i-i%sudoku.SRN, j-j%sudoku.SRN, num));
+                unUsedInBox(i-i%sudoku.getSRN(), j-j%sudoku.getSRN(), num));
     }
 
 
     private boolean unUsedInRow(int i,int num)
     {
-        for (int j = 0; j<sudoku.N; j++)
-            if (sudoku.sudoku[i][j] == num)
+        for (int j = 0; j<sudoku.getN(); j++)
+            if (sudoku.getSudoku()[i][j] == num)
                 return false;
         return true;
     }
@@ -30,29 +30,29 @@ public class CheckMove {
 
     private boolean unUsedInCol(int j,int num)
     {
-        for (int i = 0; i<sudoku.N; i++)
-            if (sudoku.sudoku[i][j] == num)
+        for (int i = 0; i<sudoku.getN(); i++)
+            if (sudoku.getSudoku()[i][j] == num)
                 return false;
         return true;
     }
     public boolean unUsedInBox(int rowStart, int colStart, int num)
     {
-        for (int i = 0; i<sudoku.SRN; i++)
-            for (int j = 0; j<sudoku.SRN; j++)
-                if (sudoku.sudoku[rowStart+i][colStart+j]==num)
+        for (int i = 0; i<sudoku.getSRN(); i++)
+            for (int j = 0; j<sudoku.getSRN(); j++)
+                if (sudoku.getSudoku()[rowStart+i][colStart+j]==num)
                     return false;
 
         return true;
     }
     public boolean isValidRow(int row)
     {
-        if(row>=0 && row<sudoku.sudoku.length)
+        if(row>=0 && row<sudoku.getSudoku().length)
             return true;
         throw new InvalidInputValueException("Invalid Row Value");
     }
     public boolean isValidCol(int col)
     {
-        if(col>=0 && col<sudoku.sudoku[0].length)
+        if(col>=0 && col<sudoku.getSudoku()[0].length)
             return true;
         throw new InvalidInputValueException("Invalid Row Value");
     }
@@ -62,35 +62,75 @@ public class CheckMove {
                 return true;
         throw new InvalidInputValueException("Invalid Sudoku Value");
     }
+    public void isGameEnd()
+    {
+        for(int[]a :sudoku.getSudoku())
+        {
+            for(int num:a)
+            {
+                if(num ==0)
+                    return;
+            }
+        }
+        sudoku.setGameEnd(true);
+    }
     public MoveResponse CheckIfSafeWithHint(Move request)
     {
         MoveResponse moveResponse = new MoveResponse();
-        if(checkIfSafe(request.getRow(), request.getCol(),request.getNum()))
+        if(sudoku.isGameStart()== false)
         {
-            sudoku.consecutiveError = 0;
-            moveResponse.setResult("success");
+            moveResponse.setResult("Game is not started yet");
+            return moveResponse;
         }
-        else{
-            moveResponse.setResult("error");
-            sudoku.consecutiveError +=1;
-            if(sudoku.consecutiveError ==3)
+        else if(sudoku.isGameEnd())
+        {
+            moveResponse.setResult("Game is Over");
+            return moveResponse;
+        }
+        else if(sudoku.getSudoku()[request.getRow()][request.getCol()] != 0)
+        {
+            if(sudoku.getSudoku()[request.getRow()][request.getCol()] == request.getNum())
             {
-                moveResponse.setHint(getHint());
-                sudoku.consecutiveError = 0;
+                moveResponse.setResult("Valid");
+            }
+            else{
+                moveResponse.setResult("Invalid");
+                sudoku.setConsecutiveError(sudoku.getConsecutiveError()+1);;
+                if(sudoku.getConsecutiveError() ==3)
+                {
+                    moveResponse.setHint(getHint());
+                    sudoku.setConsecutiveError(0);
+                }
             }
         }
-
+        else if(checkIfSafe(request.getRow(), request.getCol(),request.getNum()))
+        {
+            sudoku.setConsecutiveError(0);
+            sudoku.getSudoku()[request.getRow()][request.getCol()] = request.getNum();
+            moveResponse.setResult("Valid");
+            isGameEnd();
+        }
+        else{
+            moveResponse.setResult("Invalid");
+            sudoku.setConsecutiveError(sudoku.getConsecutiveError()+1);;
+            if(sudoku.getConsecutiveError() ==3)
+            {
+                moveResponse.setHint(getHint());
+                sudoku.setConsecutiveError(0);
+            }
+        }
+        //sudoku.printSudoku();
         return moveResponse;
 
     }
     public Move getHint()
     {
 
-        for(int i = 0;i<sudoku.sudoku.length;i++)
+        for(int i = 0;i<sudoku.getSudoku().length;i++)
         {
-            for(int j = 0;j<sudoku.sudoku[0].length;j++)
+            for(int j = 0;j<sudoku.getSudoku()[0].length;j++)
             {
-                if(sudoku.sudoku[i][j] == 0)
+                if(sudoku.getSudoku()[i][j] == 0)
                 {
                     for(int num= 1;num<=9;num++)
                     {
