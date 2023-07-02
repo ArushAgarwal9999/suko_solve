@@ -144,7 +144,10 @@ public class CreateSudokuSkeleton {
         }
         for(InputData data : userInput)
         {
-            sudoku.getSudoku()[data.getRow()][data.getCol()] = data.getValue();
+            if(checkMove.checkIfSafe(data.getRow(),data.getCol(),data.getValue()))
+                sudoku.getSudoku()[data.getRow()][data.getCol()] = data.getValue();
+            else
+                throw new InvalidInputValueException("Invalid Input value");
         }
 
 

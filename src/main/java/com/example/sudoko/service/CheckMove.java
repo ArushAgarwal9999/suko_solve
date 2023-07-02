@@ -13,6 +13,9 @@ public class CheckMove {
     Sudoku sudoku;
     public boolean checkIfSafe(int i,int j,int num)
     {
+        if(sudoku.getSudoku()[i][j] == num)
+            return true;
+
         return (isValidRow(i)&& isValidCol(j)&& isValidNum(num)&& unUsedInRow(i, num) &&
                 unUsedInCol(j, num) &&
                 unUsedInBox(i-i%sudoku.getSRN(), j-j%sudoku.getSRN(), num));
@@ -86,22 +89,6 @@ public class CheckMove {
         {
             moveResponse.setResult("Game is Over");
             return moveResponse;
-        }
-        else if(sudoku.getSudoku()[request.getRow()][request.getCol()] != 0)
-        {
-            if(sudoku.getSudoku()[request.getRow()][request.getCol()] == request.getNum())
-            {
-                moveResponse.setResult("Valid");
-            }
-            else{
-                moveResponse.setResult("Invalid");
-                sudoku.setConsecutiveError(sudoku.getConsecutiveError()+1);;
-                if(sudoku.getConsecutiveError() ==3)
-                {
-                    moveResponse.setHint(getHint());
-                    sudoku.setConsecutiveError(0);
-                }
-            }
         }
         else if(checkIfSafe(request.getRow(), request.getCol(),request.getNum()))
         {
