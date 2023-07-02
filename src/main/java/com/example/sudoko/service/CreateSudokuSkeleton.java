@@ -155,16 +155,20 @@ public class CreateSudokuSkeleton {
 
     public boolean createSudokuSkeleton(StartRequest req)
     {
+        if(req.getMove().equalsIgnoreCase("start"))
+        {
+            if(req.getData() == null || req.getData().size() == 0)
+            {
+                createRandomSudoku();
+            }
+            else{
+                createUserDefineSudokuSkeleton(req.getData());
+            }
+            sudoku.setGameStart(true);
+            //sudoku.printSudoku();
+            return true;
+        }
+        return false;
 
-                if(req.getData() == null || req.getData().size() == 0)
-                {
-                    createRandomSudoku();
-                }
-                else{
-                    createUserDefineSudokuSkeleton(req.getData());
-                }
-                sudoku.setGameStart(true);
-                //sudoku.printSudoku();
-        return true;
     }
 }

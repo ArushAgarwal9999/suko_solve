@@ -24,7 +24,7 @@ public class Sudoku {
     private  int N = 9;
     @Getter
     @Setter
-    private  int K = 15;
+    private  int K = 20;
     @Getter
     @Setter
     private int[][] sudoku = new int[N][N];
